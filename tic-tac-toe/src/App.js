@@ -8,12 +8,29 @@ import { useState } from 'react';
 function Game() {
   const [isXTurn, setIsXTurn] = useState(true)
   const [history, setHistory] = useState([Array(9).fill(null)])
-  const currentSquares = history[history.length - 1]
+  const [currentMove, setCurrentMove] = useState(0)
+  const currentSquares = history[currentMove]
 
   function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares])
+    let nextHistory = [...history.slice(0, currentMove + 1), nextSquares]
+    setHistory(nextHistory)
     setIsXTurn(!isXTurn)
+    setCurrentMove(nextHistory.length - 1)
   }
+
+  function jumpTo(moveNumber) {
+    setCurrentMove(moveNumber)
+    setIsXTurn(moveNumber % 2 === 0)
+  }
+
+  const moves = history.map((squares, moveNumber) => {
+    let description = moveNumber > 0 ? `Go to move #${moveNumber}` : "Go to game start";
+    return (
+      <li key={moveNumber}>
+        <button onClick={() => jumpTo(moveNumber)}>{description}</button>
+      </li>
+    )
+  })
 
   return (
     <div className="game">
@@ -21,7 +38,7 @@ function Game() {
         <Board squares={currentSquares} isXTurn={isXTurn} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{/* TODO */}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   )
