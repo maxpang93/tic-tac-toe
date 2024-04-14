@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 
 function Game() {
-  const [isXTurn, setIsXTurn] = useState(true)
   const [history, setHistory] = useState([Array(9).fill(null)])
   const [currentMove, setCurrentMove] = useState(0)
   const currentSquares = history[currentMove]
@@ -14,13 +13,11 @@ function Game() {
   function handlePlay(nextSquares) {
     let nextHistory = [...history.slice(0, currentMove + 1), nextSquares]
     setHistory(nextHistory)
-    setIsXTurn(!isXTurn)
     setCurrentMove(nextHistory.length - 1)
   }
 
   function jumpTo(moveNumber) {
     setCurrentMove(moveNumber)
-    setIsXTurn(moveNumber % 2 === 0)
   }
 
   const moves = history.map((squares, moveNumber) => {
@@ -35,7 +32,7 @@ function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board squares={currentSquares} isXTurn={isXTurn} onPlay={handlePlay} />
+        <Board squares={currentSquares} currentMove={currentMove} onPlay={handlePlay} />
       </div>
       <div className="game-info">
         <ol>{moves}</ol>
@@ -44,18 +41,16 @@ function Game() {
   )
 }
 
-function Board({ squares, isXTurn, onPlay }) {
+function Board({ squares, currentMove, onPlay }) {
+  let isXTurn = currentMove % 2 === 0
+
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return
     }
 
     const nextSquares = squares.slice()
-    if (isXTurn) {
-      nextSquares[i] = 'X'
-    } else {
-      nextSquares[i] = 'O'
-    }
+    nextSquares[i] = isXTurn ? 'X' : 'O'
 
     onPlay(nextSquares)
   }
