@@ -5,10 +5,29 @@ import './style.css';
 import { useState } from 'react';
 
 
-function Board() {
-  const [squares, setSquares] = useState(Array(9).fill(null))
+function Game() {
   const [isXTurn, setIsXTurn] = useState(true)
+  const [history, setHistory] = useState([Array(9).fill(null)])
+  const currentSquares = history[history.length - 1]
 
+  function handlePlay(nextSquares) {
+    setHistory([...history, nextSquares])
+    setIsXTurn(!isXTurn)
+  }
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board squares={currentSquares} isXTurn={isXTurn} onPlay={handlePlay} />
+      </div>
+      <div className="game-info">
+        <ol>{/* TODO */}</ol>
+      </div>
+    </div>
+  )
+}
+
+function Board({ squares, isXTurn, onPlay }) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return
@@ -21,8 +40,7 @@ function Board() {
       nextSquares[i] = 'O'
     }
 
-    setSquares(nextSquares)
-    setIsXTurn(!isXTurn)
+    onPlay(nextSquares)
   }
 
   let status;
@@ -82,4 +100,4 @@ function calculateWinner(squares) {
   }
 }
 
-export default Board;
+export default Game;
