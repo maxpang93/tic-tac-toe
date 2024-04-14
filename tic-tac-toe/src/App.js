@@ -7,18 +7,35 @@ import { useState } from 'react';
 
 function Board() {
   const [squares, setSquares] = useState(Array(9).fill(null))
+  const [isXTurn, setIsXTurn] = useState(true)
 
   function handleClick(i) {
-    const nextSquares = squares.slice()
-    if (nextSquares[i] === 'X') {
-      nextSquares[i] = 'O'
-    } else {
-      nextSquares[i] = 'X'
+    if (squares[i] || calculateWinner(squares)) {
+      return
     }
+
+    const nextSquares = squares.slice()
+    if (isXTurn) {
+      nextSquares[i] = 'X'
+    } else {
+      nextSquares[i] = 'O'
+    }
+
     setSquares(nextSquares)
+    setIsXTurn(!isXTurn)
   }
+
+  let status;
+  let winner = calculateWinner(squares)
+  if (winner) {
+    status = `Winner: ${winner}`
+  } else {
+    status = `Current Player: ${isXTurn ? "X" : "O"}`
+  }
+
   return (
     <>
+      <div className="status">{status}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -44,5 +61,25 @@ function Square({ value, onSquareClick }) {
   </button>;
 }
 
+
+function calculateWinner(squares) {
+  const winningLines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ]
+
+  for (let line of winningLines) {
+    const [a, b, c] = line
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a]
+    }
+  }
+}
 
 export default Board;
